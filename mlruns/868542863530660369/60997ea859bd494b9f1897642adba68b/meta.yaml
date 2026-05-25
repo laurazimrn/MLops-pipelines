@@ -1,0 +1,14 @@
+artifact_uri: /home/laura/MLOps/mlops-pipeline/mlruns/868542863530660369/60997ea859bd494b9f1897642adba68b/artifacts
+end_time: 1779738516223
+entry_point_name: ''
+experiment_id: '868542863530660369'
+lifecycle_stage: active
+run_id: 60997ea859bd494b9f1897642adba68b
+run_name: random_forest_v1
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1779738516209
+status: 4
+tags: []
+user_id: laura

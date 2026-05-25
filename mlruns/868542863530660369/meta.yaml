@@ -1,0 +1,8 @@
+artifact_location: /home/laura/MLOps/mlops-pipeline/mlruns/868542863530660369
+creation_time: 1779738516094
+experiment_id: '868542863530660369'
+last_update_time: 1779738516094
+lifecycle_stage: active
+name: churn-prediction
+trace_location: null
+workspace: default

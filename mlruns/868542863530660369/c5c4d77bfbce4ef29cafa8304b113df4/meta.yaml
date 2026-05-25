@@ -1,0 +1,14 @@
+artifact_uri: /home/laura/MLOps/mlops-pipeline/mlruns/868542863530660369/c5c4d77bfbce4ef29cafa8304b113df4/artifacts
+end_time: 1779738641975
+entry_point_name: ''
+experiment_id: '868542863530660369'
+lifecycle_stage: active
+run_id: c5c4d77bfbce4ef29cafa8304b113df4
+run_name: logistic_regression
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1779738637772
+status: 3
+tags: []
+user_id: laura

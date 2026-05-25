@@ -1,0 +1,4 @@
+{
+  "best_model": "random_forest",
+  "auc_roc": 0.7751
+}
