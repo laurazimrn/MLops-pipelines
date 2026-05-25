@@ -1,11 +1,9 @@
 .venv/
 __pycache__/
 *.pyc
-data/
-!data/
+data/*
 !data/*.dvc
 !data/.gitignore
-!data/.placeholder
 models/
 .env
 .DS_Store
