@@ -74,7 +74,7 @@ def test_train_runs_and_saves(tmp_path, monkeypatch, small_df):
     monkeypatch.setattr(t, "DATA_PATH",    csv_path)
     monkeypatch.setattr(t, "MODEL_DIR",    tmp_path / "models")
     monkeypatch.setattr(t, "METRICS_PATH", tmp_path / "metrics/scores.json")
-    mlflow.set_tracking_uri(f"file://{tmp_path}/mlruns")
+    mlflow.set_tracking_uri(f"sqlite:///{tmp_path}/mlflow.db")
 
     t.train(n_estimators=10, max_depth=3)
 

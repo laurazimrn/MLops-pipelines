@@ -1,0 +1,26 @@
+schema: '2.0'
+stages:
+  train:
+    cmd: python pipeline/train.py
+    deps:
+    - path: data/churn.csv
+      hash: md5
+      md5: d924775093147975046019cddbc73b78
+      size: 28883
+    - path: pipeline/train.py
+      hash: md5
+      md5: a401b9d570f6d6595764aab95c06be12
+      size: 3733
+    outs:
+    - path: metrics/scores.json
+      hash: md5
+      md5: 1beac72b034917d3964df4774ecc4737
+      size: 56
+    - path: models/features.json
+      hash: md5
+      md5: 8d73c48046bacf109bb4ee58bdc960c2
+      size: 137
+    - path: models/model.joblib
+      hash: md5
+      md5: 5a5d4fb7122f191651ed18502c671ee7
+      size: 451241
