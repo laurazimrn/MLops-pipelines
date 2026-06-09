@@ -6,5 +6,7 @@ data/*
 !data/.gitignore
 models/
 mlruns/
+dvc.yaml
+dvc.lock
 .env
 .DS_Store
