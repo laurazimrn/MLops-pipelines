@@ -5,5 +5,6 @@ data/*
 !data/*.dvc
 !data/.gitignore
 models/
+mlruns/
 .env
 .DS_Store

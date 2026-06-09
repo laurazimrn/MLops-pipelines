@@ -5,7 +5,6 @@ import pandas as pd
 import numpy as np
 import joblib
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_auc_score, f1_score
 from sklearn.datasets import load_iris
@@ -37,7 +36,14 @@ def gerar_dados(path, n=1000):
     df.to_csv(path, index=False)
     print(f"[INFO] Dataset gerado: {n} registros")
 
-def avaliar(model, X_test, y_test):
+def load_data():
+    df = pd.read_csv(DATA_PATH)
+    X  = df.drop(columns=["churn"])
+    y  = df["churn"]
+    return X, y
+
+def evaluate(model, X_test, y_test) -> dict:
+    """Retorna dicionário de métricas — fácil de logar no MLflow."""
     y_pred  = model.predict(X_test)
     y_proba = model.predict_proba(X_test)[:, 1]
     return {
@@ -45,57 +51,43 @@ def avaliar(model, X_test, y_test):
         "f1":      round(f1_score(y_test, y_pred), 4),
     }
 
+def save_artifacts(model, features, metrics):
+    """Salva modelo + lista de features + métricas."""
+    MODEL_DIR.mkdir(exist_ok=True)
+    METRICS_PATH.parent.mkdir(exist_ok=True)
+
+    joblib.dump(model, MODEL_DIR / "model.joblib")
+    (MODEL_DIR / "features.json").write_text(
+        json.dumps({"features": features})
+    )
+    METRICS_PATH.write_text(json.dumps(metrics, indent=2))
+
 def train(n_estimators=100, max_depth=5):
-    if not DATA_PATH.exists():
-        gerar_dados(DATA_PATH)
+    mlflow.set_experiment("churn-prediction")
 
-    df = pd.read_csv(DATA_PATH)
-    X  = df.drop(columns=["churn"])
-    y  = df["churn"]
-
+    X, y = load_data()
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y
     )
 
-    mlflow.set_experiment("churn-prediction")
+    with mlflow.start_run():
+        model = RandomForestClassifier(
+            n_estimators=n_estimators,
+            max_depth=max_depth,
+            random_state=42
+        )
+        model.fit(X_train, y_train)
 
-    modelos = {
-        "logistic_regression": LogisticRegression(max_iter=500, random_state=42),
-        "random_forest":       RandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth, random_state=42),
-    }
+        metrics = evaluate(model, X_test, y_test)
 
-    melhor_auc   = 0
-    melhor_model = None
-    melhor_nome  = None
+        mlflow.log_params({"n_estimators": n_estimators, "max_depth": max_depth})
+        mlflow.log_metrics(metrics)
+        mlflow.sklearn.log_model(model, "model")
 
-    for nome, modelo in modelos.items():
-        with mlflow.start_run(run_name=nome):
-            modelo.fit(X_train, y_train)
-            metrics = avaliar(modelo, X_test, y_test)
+        save_artifacts(model, list(X.columns), metrics)
+        print(f"✓ AUC-ROC: {metrics['auc_roc']} | F1: {metrics['f1']}")
 
-            mlflow.log_param("modelo", nome)
-            mlflow.log_param("n_estimators", n_estimators)
-            mlflow.log_metrics(metrics)
-            mlflow.sklearn.log_model(modelo, "model")
-
-            print(f"  {nome}: AUC={metrics['auc_roc']} | F1={metrics['f1']}")
-
-            if metrics["auc_roc"] > melhor_auc:
-                melhor_auc   = metrics["auc_roc"]
-                melhor_model = modelo
-                melhor_nome  = nome
-
-    # Salva o melhor modelo
-    MODEL_DIR.mkdir(exist_ok=True)
-    METRICS_PATH.parent.mkdir(exist_ok=True)
-
-    joblib.dump(melhor_model, MODEL_DIR / "model.joblib")
-    (MODEL_DIR / "features.json").write_text(json.dumps({"features": list(X.columns)}))
-    METRICS_PATH.write_text(json.dumps({"best_model": melhor_nome, "auc_roc": melhor_auc}, indent=2))
-
-    print(f"\n✓ Melhor modelo: {melhor_nome} (AUC={melhor_auc})")
-    print(f"✓ Salvo em: {MODEL_DIR}/model.joblib")
-
+# Permite passar parâmetros pela linha de comando
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--n-estimators", type=int, default=100)
