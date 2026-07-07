@@ -5,8 +5,9 @@ from fastapi import FastAPI
 from pydantic import BaseModel, Field
 
 # Carrega modelo e lista de features ao iniciar
-model    = joblib.load("models/model.joblib")
-features = json.loads(Path("models/features.json").read_text())["features"]
+BASE_DIR = Path(__file__).resolve().parent.parent
+model    = joblib.load(BASE_DIR / "models" / "model.joblib")
+features = json.loads((BASE_DIR / "models" / "features.json").read_text())["features"]
 
 app = FastAPI(title="Churn Prediction API")
 

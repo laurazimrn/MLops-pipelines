@@ -63,6 +63,7 @@ def save_artifacts(model, features, metrics):
     METRICS_PATH.write_text(json.dumps(metrics, indent=2))
 
 def train(n_estimators=100, max_depth=5):
+    mlflow.set_tracking_uri("sqlite:///mlflow.db")
     mlflow.set_experiment("churn-prediction")
 
     X, y = load_data()
